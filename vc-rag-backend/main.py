@@ -1,4 +1,4 @@
-# DEPLOY TEST CORS ENABLED
+# DEPLOY TEST CORS ENABLED AGAIN
 
 from fastapi.middleware.cors import CORSMiddleware
 
