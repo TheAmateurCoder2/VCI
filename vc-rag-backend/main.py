@@ -4,24 +4,21 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
+# 🔑 CORS (THIS IS CRITICAL)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],        # allow Firebase
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["*"],        # <-- THIS allows OPTIONS
     allow_headers=["*"],
 )
 
-class RagRequest(BaseModel):
+class Query(BaseModel):
     query: str
 
 @app.post("/rag")
-async def rag(req: RagRequest):
+async def rag(data: Query):
     return {
-        "answer": f"You asked: {req.query}",
+        "answer": f"You asked: {data.query}",
         "sources": []
     }
-
-@app.get("/")
-def root():
-    return {"status": "ok"}
