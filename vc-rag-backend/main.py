@@ -13,6 +13,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class Query(BaseModel):
     query: str
 
