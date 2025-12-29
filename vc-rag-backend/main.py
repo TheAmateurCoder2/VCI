@@ -24,7 +24,3 @@ async def rag(data: Query):
         "sources": []
     }
 
-
-@app.options("/rag")
-async def rag_options():
-    return JSONResponse(status_code=200, content={})
