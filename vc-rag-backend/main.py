@@ -287,8 +287,20 @@ Context:
         "max_tokens": 3000
     }
 
+    # r = requests.post(PPLX_URL, headers=HEADERS, json=payload)
+    # r.raise_for_status()
+    #
+    # answer = r.json()["choices"][0]["message"]["content"]
+
     r = requests.post(PPLX_URL, headers=HEADERS, json=payload)
-    r.raise_for_status()
+    print("PPLX STATUS:", r.status_code)
+    print("PPLX BODY:", r.text)
+
+    if r.status_code != 200:
+        return {
+            "answer": f"Perplexity error {r.status_code}",
+            "sources": []
+        }
 
     answer = r.json()["choices"][0]["message"]["content"]
 
