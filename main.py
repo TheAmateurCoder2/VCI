@@ -9,5 +9,6 @@ class Query(BaseModel):
 @app.post("/rag")
 def rag(q: Query):
     return {
-        "answer": f"AI result for: {q.query}"
+        "answer": f"You asked: {q.query}"
     }
+
