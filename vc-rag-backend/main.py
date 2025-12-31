@@ -570,49 +570,49 @@ class Query(BaseModel):
     query: str
 
 # ---------------- GLOBALS ----------------
-# embedder = None
-# index = None
-# documents = []
-# metadata = []
-# rag_ready = False
-# rag_lock = threading.Lock()
+embedder = None
+index = None
+documents = []
+metadata = []
+rag_ready = False
+rag_lock = threading.Lock()
 
 # ---------------- RAG LOADER (LAZY) ----------------
-# def load_rag():
-#     global embedder, index, documents, metadata, rag_ready
-#
-#     print("🔄 Starting RAG load...")
-#
-#     from sentence_transformers import SentenceTransformer
-#     import faiss
-#
-#     with open("data.json", "r", encoding="utf-8") as f:
-#         raw_data = json.load(f)
-#
-#     print("📄 Loaded data.json items:", len(raw_data))
-#
-#     embedder = SentenceTransformer("all-MiniLM-L6-v2")
-#     print("🧠 Model loaded")
-#
-#     dim = 384
-#     index = faiss.IndexFlatL2(dim)
-#
-#     for item in raw_data:
-#         text = item["text"]
-#         chunks = [text[i:i+400] for i in range(0, len(text), 400)]
-#
-#         for chunk in chunks:
-#             emb = embedder.encode(chunk)
-#             index.add(np.array([emb]).astype("float32"))
-#             documents.append(chunk)
-#             metadata.append({
-#                 "source": item["source"],
-#                 "url": item["url"],
-#                 "type": item["type"]
-#             })
-#
-#     rag_ready = True
-#     print("✅ RAG READY. Total chunks:", len(documents))
+def load_rag():
+    global embedder, index, documents, metadata, rag_ready
+
+    print("🔄 Starting RAG load...")
+
+    from sentence_transformers import SentenceTransformer
+    import faiss
+
+    with open("data.json", "r", encoding="utf-8") as f:
+        raw_data = json.load(f)
+
+    print("📄 Loaded data.json items:", len(raw_data))
+
+    embedder = SentenceTransformer("all-MiniLM-L6-v2")
+    print("🧠 Model loaded")
+
+    dim = 384
+    index = faiss.IndexFlatL2(dim)
+
+    for item in raw_data:
+        text = item["text"]
+        chunks = [text[i:i+400] for i in range(0, len(text), 400)]
+
+        for chunk in chunks:
+            emb = embedder.encode(chunk)
+            index.add(np.array([emb]).astype("float32"))
+            documents.append(chunk)
+            metadata.append({
+                "source": item["source"],
+                "url": item["url"],
+                "type": item["type"]
+            })
+
+    rag_ready = True
+    print("✅ RAG READY. Total chunks:", len(documents))
 
 
 
@@ -675,54 +675,54 @@ class Query(BaseModel):
 
 
 
-# import re
-#
-# def extract_search_query(answer_text: str):
-#     """
-#     Extracts SearchQuery_23456 and returns:
-#     - base_answer (without SearchQuery section)
-#     - search_query (or None)
-#     """
-#     match = re.search(r"SearchQuery_23456:\s*(.+)", answer_text, re.DOTALL)
-#
-#     if not match:
-#         return answer_text.strip(), None
-#
-#     search_query = match.group(1).strip()
-#     base_answer = answer_text[:match.start()].strip()
-#
-#     if search_query.upper() == "NONE":
-#         return base_answer, None
-#
-#     return base_answer, search_query
-#
-#
-# def perplexity_search(query: str, max_results: int = 5):
-#     r = requests.post(
-#         "https://api.perplexity.ai/search",
-#         headers={
-#             "Authorization": f"Bearer {PPLX_API_KEY}",
-#             "Content-Type": "application/json"
-#         },
-#         json={
-#             "query": query,
-#             "max_results": max_results
-#         },
-#         timeout=30
-#     )
-#
-#     r.raise_for_status()
-#     return r.json().get("results", [])
-#
-#
-# def format_search_context(results):
-#     lines = []
-#     for r in results:
-#         title = r.get("title", "")
-#         url = r.get("url", "")
-#         snippet = r.get("snippet", "")
-#         lines.append(f"- {title}\n  {snippet}\n  Source: {url}")
-#     return "\n\n".join(lines)
+import re
+
+def extract_search_query(answer_text: str):
+    """
+    Extracts SearchQuery_23456 and returns:
+    - base_answer (without SearchQuery section)
+    - search_query (or None)
+    """
+    match = re.search(r"SearchQuery_23456:\s*(.+)", answer_text, re.DOTALL)
+
+    if not match:
+        return answer_text.strip(), None
+
+    search_query = match.group(1).strip()
+    base_answer = answer_text[:match.start()].strip()
+
+    if search_query.upper() == "NONE":
+        return base_answer, None
+
+    return base_answer, search_query
+
+
+def perplexity_search(query: str, max_results: int = 5):
+    r = requests.post(
+        "https://api.perplexity.ai/search",
+        headers={
+            "Authorization": f"Bearer {PPLX_API_KEY}",
+            "Content-Type": "application/json"
+        },
+        json={
+            "query": query,
+            "max_results": max_results
+        },
+        timeout=30
+    )
+
+    r.raise_for_status()
+    return r.json().get("results", [])
+
+
+def format_search_context(results):
+    lines = []
+    for r in results:
+        title = r.get("title", "")
+        url = r.get("url", "")
+        snippet = r.get("snippet", "")
+        lines.append(f"- {title}\n  {snippet}\n  Source: {url}")
+    return "\n\n".join(lines)
 
 
 
@@ -735,235 +735,235 @@ class Query(BaseModel):
 # ---------------- QUERY ENDPOINT ----------------
 @app.post("/rag")
 async def rag(q: Query):
-#     global rag_ready
-#
-#     # Lazy load RAG on first request
-#     if not rag_ready:
-#         with rag_lock:
-#             if not rag_ready:
-#                 load_rag()
-#
-#     q_emb = embedder.encode(q.query)
-#     _, I = index.search(np.array([q_emb]).astype("float32"), k=5)
-#
-#     retrieved_chunks = [documents[i] for i in I[0]]
-#     retrieved_meta = [metadata[i] for i in I[0]]
-#
-#     context = "\n\n".join(retrieved_chunks)
-#
-#     # ---------------- PROMPT (UNCHANGED, FULL) ----------------
-#     prompt = f"""
-# You are a venture capital research analyst.
-# You have to explain real startup funding data. You should deliver accurate, grounded insights on investors, funding trends and policies.
-# Explain the important financial details clearly, including funding amounts, investors, stages, timelines, and valuations when available.
-#
-#
-# Critical answering rules (MANDATORY):
-# - NEVER ask the user for clarification.
-# - NEVER say you lack information or context.
-# - NEVER explain limitations, uncertainty, or missing data.
-# - ALWAYS assume reasonable user intent and answer directly.
-# - If the query is short, vague, or a single word (e.g. "redmi"), infer the most likely meaning and proceed.
-# - If the retrieved context is weak, irrelevant, or insufficient, IGNORE it and answer using your general knowledge.
-# - You must ALWAYS answer the question that was asked.
-#
-#
-# Using the context below when relevant, write a clear, concise answer.
-# Do NOT copy text verbatim.
-# Do NOT include citation markers like [1], [2], or [3].
-# Add clickable URLs when appropriate to text.
-# Summarize and synthesize the information.
-# Financial information should be in bold.
-# Phrases such as 'non-profit' should be in bold.
-#
-# Formatting rules (STRICT):
-# - Use proper Markdown formatting.
-# - Convert all URLs into clickable Markdown links: [descriptive text](https://example.com)
-# - Never place raw URLs in square brackets or inline text.
-# - Use paragraphs and line breaks for readability.
-# - Highlight key facts (dates, amounts, names) in **bold**.
-#
-# Context handling rules (IMPORTANT):
-# - First, check whether the provided context is relevant to the question.
-# - If the context is partially relevant, use it where applicable and supplement missing facts with your own verified knowledge.
-# - If the context is irrelevant or insufficient, IGNORE it completely and answer using your general knowledge.
-# - NEVER state that the context is irrelevant, missing, or mismatched.
-# - NEVER refuse to answer due to missing or irrelevant context.
-# - NEVER explain your internal reasoning, retrieval process, or limitations.
-#
-# Mention sources in the end in the format
-#
-# ---
-# Sources:
-# - Source 1 (link)
-# - Source 2 (link)
-# - Source 3 (link)
-# ...
-#
-#
-#
-# After generating your answer, identify any claims, figures, or entities in your response that would benefit from real-time verification or enrichment.
-#
-# Then generate a concise web search query that can be used to fetch up-to-date financial or funding information related to your own answer.
-#
-# Output format (STRICT):
-# Answer:
-# <your full answer in Markdown>
-#
-# SearchQuery_23456:
-# <one concise search query, or "NONE" if no search is needed>
-#
-# Rules:
-# - The SearchQuery must be derived from what you already answered.
-# - The SearchQuery must be factual and suitable for a web search engine.
-# - Do NOT explain why the search is needed.
-# - Do NOT include commentary or extra text.
-# - If the answer is already complete and unlikely to change with real-time data, output "NONE".
-#
-#
-# Question:
-# {q.query}
-#
-# Context (Consider only if relevant, else ignore):
-# {context}
-# """
-#
-#     payload = {
-#         "model": "sonar-pro",
-#         "messages": [
-#             {
-#                 "role": "system",
-#                 "content": "You are a concise venture capital research analyst."
-#             },
-#             {
-#                 "role": "user",
-#                 "content": prompt
-#             }
-#         ],
-#         "temperature": 0.2,
-#         "max_tokens": 3000
-#     }
-#
-#     r = requests.post(
-#         PPLX_URL,
-#         headers={
-#             "Authorization": f"Bearer {PPLX_API_KEY}",
-#             "Content-Type": "application/json"
-#         },
-#         json=payload,
-#         timeout=60
-#     )
-#
-#     print("🧠 PPLX status:", r.status_code)
-#
-#     if r.status_code != 200:
-#         print("❌ PPLX error:", r.text)
-#         return {
-#             "answer": "Perplexity API error",
-#             "sources": []
-#         }
-#
-#     answer = r.json()["choices"][0]["message"]["content"]
-#
-#     print("🔍 SEARCH STATUS:", r.status_code)
-#     print("🔍 SEARCH BODY:", r.text)
-#
-#     # ---------------- SEARCH QUERY EXTRACTION ----------------
-#     base_answer, search_query = extract_search_query(answer)
-#
-#     print("🧪 BASE ANSWER:", base_answer[:200])
-#     print("🧪 SEARCH QUERY:", search_query)
-#
-#     # ---------------- OPTIONAL REAL-TIME ENRICHMENT ----------------
-#     if search_query:
-#         try:
-#             search_results = perplexity_search(search_query)
-#             search_context = format_search_context(search_results)
-#         except Exception as e:
-#             print("❌ SEARCH FAILED:", repr(e))
-#             final_answer = base_answer
-#             search_results = []
-#
-#         # search_results = perplexity_search(search_query)
-#         # search_context = format_search_context(search_results)
-#
-#         enrichment_prompt = f"""
-#     You previously wrote the following answer:
-#
-#     {base_answer}
-#
-#     Below is real-time factual information retrieved from the web.
-#     Use it ONLY to enrich or add missing financial details.
-#     Do NOT contradict your original answer.
-#     Do NOT repeat unchanged information.
-#
-#     LIVE SEARCH FACTS:
-#     {search_context}
-#     """
-#
-#         enrich_resp = requests.post(
-#             PPLX_URL,
-#             headers={
-#                 "Authorization": f"Bearer {PPLX_API_KEY}",
-#                 "Content-Type": "application/json"
-#             },
-#             json={
-#                 "model": "sonar-pro",
-#                 "messages": [
-#                     {"role": "system", "content": "You are a concise venture capital research analyst."},
-#                     {"role": "user", "content": enrichment_prompt}
-#                 ],
-#                 "temperature": 0.2,
-#                 "max_tokens": 2000
-#             },
-#             timeout=60
-#         )
-#
-#         enrich_resp.raise_for_status()
-#         final_answer = enrich_resp.json()["choices"][0]["message"]["content"]
-#     else:
-#         final_answer = base_answer
-#
-#
-#
-#     # ---------------- SOURCE DEDUPLICATION ----------------
-#     unique_sources = {}
-#     for m in retrieved_meta:
-#         url = m.get("url")
-#         if url and url not in unique_sources:
-#             unique_sources[url] = {
-#                 "url": url,
-#                 "source": m.get("source"),
-#                 "type": m.get("type")
-#             }
-#
-#     sources = list(unique_sources.values())[:3]  # limit to top 3
-#
-#
-#
-#
-#
-#
-#     if search_query:
-#         for r in search_results:
-#             url = r.get("url")
-#             if url and url not in unique_sources:
-#                 unique_sources[url] = {
-#                     "url": url,
-#                     "source": r.get("title"),
-#                     "type": "live-search"
-#                 }
-#
-#     return {
-#         "answer": final_answer,
-#         "sources": sources
-#     }
+    global rag_ready
 
+    # Lazy load RAG on first request
+    if not rag_ready:
+        with rag_lock:
+            if not rag_ready:
+                load_rag()
+
+    q_emb = embedder.encode(q.query)
+    _, I = index.search(np.array([q_emb]).astype("float32"), k=5)
+
+    retrieved_chunks = [documents[i] for i in I[0]]
+    retrieved_meta = [metadata[i] for i in I[0]]
+
+    context = "\n\n".join(retrieved_chunks)
+
+    # ---------------- PROMPT (UNCHANGED, FULL) ----------------
+    prompt = f"""
+You are a venture capital research analyst.
+You have to explain real startup funding data. You should deliver accurate, grounded insights on investors, funding trends and policies.
+Explain the important financial details clearly, including funding amounts, investors, stages, timelines, and valuations when available.
+
+
+Critical answering rules (MANDATORY):
+- NEVER ask the user for clarification.
+- NEVER say you lack information or context.
+- NEVER explain limitations, uncertainty, or missing data.
+- ALWAYS assume reasonable user intent and answer directly.
+- If the query is short, vague, or a single word (e.g. "redmi"), infer the most likely meaning and proceed.
+- If the retrieved context is weak, irrelevant, or insufficient, IGNORE it and answer using your general knowledge.
+- You must ALWAYS answer the question that was asked.
+
+
+Using the context below when relevant, write a clear, concise answer.
+Do NOT copy text verbatim.
+Do NOT include citation markers like [1], [2], or [3].
+Add clickable URLs when appropriate to text.
+Summarize and synthesize the information.
+Financial information should be in bold.
+Phrases such as 'non-profit' should be in bold.
+
+Formatting rules (STRICT):
+- Use proper Markdown formatting.
+- Convert all URLs into clickable Markdown links: [descriptive text](https://example.com)
+- Never place raw URLs in square brackets or inline text.
+- Use paragraphs and line breaks for readability.
+- Highlight key facts (dates, amounts, names) in **bold**.
+
+Context handling rules (IMPORTANT):
+- First, check whether the provided context is relevant to the question.
+- If the context is partially relevant, use it where applicable and supplement missing facts with your own verified knowledge.
+- If the context is irrelevant or insufficient, IGNORE it completely and answer using your general knowledge.
+- NEVER state that the context is irrelevant, missing, or mismatched.
+- NEVER refuse to answer due to missing or irrelevant context.
+- NEVER explain your internal reasoning, retrieval process, or limitations.
+
+Mention sources in the end in the format
+
+---
+Sources:
+- Source 1 (link)
+- Source 2 (link)
+- Source 3 (link)
+...
+
+
+
+After generating your answer, identify any claims, figures, or entities in your response that would benefit from real-time verification or enrichment.
+
+Then generate a concise web search query that can be used to fetch up-to-date financial or funding information related to your own answer.
+
+Output format (STRICT):
+Answer:
+<your full answer in Markdown>
+
+SearchQuery_23456:
+<one concise search query, or "NONE" if no search is needed>
+
+Rules:
+- The SearchQuery must be derived from what you already answered.
+- The SearchQuery must be factual and suitable for a web search engine.
+- Do NOT explain why the search is needed.
+- Do NOT include commentary or extra text.
+- If the answer is already complete and unlikely to change with real-time data, output "NONE".
+
+
+Question:
+{q.query}
+
+Context (Consider only if relevant, else ignore):
+{context}
+"""
+
+    payload = {
+        "model": "sonar-pro",
+        "messages": [
+            {
+                "role": "system",
+                "content": "You are a concise venture capital research analyst."
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        "temperature": 0.2,
+        "max_tokens": 3000
+    }
+
+    r = requests.post(
+        PPLX_URL,
+        headers={
+            "Authorization": f"Bearer {PPLX_API_KEY}",
+            "Content-Type": "application/json"
+        },
+        json=payload,
+        timeout=60
+    )
+
+    print("🧠 PPLX status:", r.status_code)
+
+    if r.status_code != 200:
+        print("❌ PPLX error:", r.text)
+        return {
+            "answer": "Perplexity API error",
+            "sources": []
+        }
+
+    answer = r.json()["choices"][0]["message"]["content"]
+
+    print("🔍 SEARCH STATUS:", r.status_code)
+    print("🔍 SEARCH BODY:", r.text)
+
+    # ---------------- SEARCH QUERY EXTRACTION ----------------
+    base_answer, search_query = extract_search_query(answer)
+
+    print("🧪 BASE ANSWER:", base_answer[:200])
+    print("🧪 SEARCH QUERY:", search_query)
+
+    # ---------------- OPTIONAL REAL-TIME ENRICHMENT ----------------
+    if search_query:
+        try:
+            search_results = perplexity_search(search_query)
+            search_context = format_search_context(search_results)
+        except Exception as e:
+            print("❌ SEARCH FAILED:", repr(e))
+            final_answer = base_answer
+            search_results = []
+
+        # search_results = perplexity_search(search_query)
+        # search_context = format_search_context(search_results)
+
+        enrichment_prompt = f"""
+    You previously wrote the following answer:
+
+    {base_answer}
+
+    Below is real-time factual information retrieved from the web.
+    Use it ONLY to enrich or add missing financial details.
+    Do NOT contradict your original answer.
+    Do NOT repeat unchanged information.
+
+    LIVE SEARCH FACTS:
+    {search_context}
+    """
+
+        enrich_resp = requests.post(
+            PPLX_URL,
+            headers={
+                "Authorization": f"Bearer {PPLX_API_KEY}",
+                "Content-Type": "application/json"
+            },
+            json={
+                "model": "sonar-pro",
+                "messages": [
+                    {"role": "system", "content": "You are a concise venture capital research analyst."},
+                    {"role": "user", "content": enrichment_prompt}
+                ],
+                "temperature": 0.2,
+                "max_tokens": 2000
+            },
+            timeout=60
+        )
+
+        enrich_resp.raise_for_status()
+        final_answer = enrich_resp.json()["choices"][0]["message"]["content"]
+    else:
+        final_answer = base_answer
+
+
+
+    # ---------------- SOURCE DEDUPLICATION ----------------
+    unique_sources = {}
+    for m in retrieved_meta:
+        url = m.get("url")
+        if url and url not in unique_sources:
+            unique_sources[url] = {
+                "url": url,
+                "source": m.get("source"),
+                "type": m.get("type")
+            }
+
+    sources = list(unique_sources.values())[:3]  # limit to top 3
+
+
+
+
+
+
+    if search_query:
+        for r in search_results:
+            url = r.get("url")
+            if url and url not in unique_sources:
+                unique_sources[url] = {
+                    "url": url,
+                    "source": r.get("title"),
+                    "type": "live-search"
+                }
 
     return {
-        "answer": "temp",
-        "sources": []
+        "answer": final_answer,
+        "sources": sources
     }
+
+
+    # return {
+    #     "answer": "temp",
+    #     "sources": []
+    # }
 
 
 
