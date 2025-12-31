@@ -642,6 +642,7 @@ Do NOT copy text verbatim.
 Do NOT include citation markers like [1], [2], or [3].
 Add clickable URLs when appropriate to text.
 Summarize and synthesize the information.
+Financial information should be in bold.
 
 Question:
 {q.query}
