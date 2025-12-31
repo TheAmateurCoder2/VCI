@@ -865,13 +865,27 @@ Context (Consider only if relevant, else ignore):
 
     answer = r.json()["choices"][0]["message"]["content"]
 
+    print("🔍 SEARCH STATUS:", r.status_code)
+    print("🔍 SEARCH BODY:", r.text)
+
     # ---------------- SEARCH QUERY EXTRACTION ----------------
     base_answer, search_query = extract_search_query(answer)
 
+    print("🧪 BASE ANSWER:", base_answer[:200])
+    print("🧪 SEARCH QUERY:", search_query)
+
     # ---------------- OPTIONAL REAL-TIME ENRICHMENT ----------------
     if search_query:
-        search_results = perplexity_search(search_query)
-        search_context = format_search_context(search_results)
+        try:
+            search_results = perplexity_search(search_query)
+            search_context = format_search_context(search_results)
+        except Exception as e:
+            print("❌ SEARCH FAILED:", repr(e))
+            final_answer = base_answer
+            search_results = []
+
+        # search_results = perplexity_search(search_query)
+        # search_context = format_search_context(search_results)
 
         enrichment_prompt = f"""
     You previously wrote the following answer:
