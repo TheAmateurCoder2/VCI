@@ -200,37 +200,80 @@ metadata = []
 rag_ready = False
 
 # ---------------- RAG LOADER ----------------
+# def load_rag():
+#     global embedder, index, documents, metadata, rag_ready
+#
+#     from sentence_transformers import SentenceTransformer
+#     import faiss
+#
+#     print("Loading RAG data...")
+#
+#     with open("data.json", "r", encoding="utf-8") as f:
+#         raw_data = json.load(f)
+#
+#     embedder = SentenceTransformer("all-MiniLM-L6-v2")
+#     dim = 384
+#     index = faiss.IndexFlatL2(dim)
+#
+#     for item in raw_data:
+#         text = item["text"]
+#         chunks = [text[i:i+400] for i in range(0, len(text), 400)]
+#
+#         for chunk in chunks:
+#             emb = embedder.encode(chunk)
+#             index.add(np.array([emb]).astype("float32"))
+#             documents.append(chunk)
+#             metadata.append({
+#                 "source": item["source"],
+#                 "url": item["url"],
+#                 "type": item["type"]
+#             })
+#
+#     rag_ready = True
+#     print("RAG READY. Total chunks:", len(documents))
+
+
 def load_rag():
     global embedder, index, documents, metadata, rag_ready
 
-    from sentence_transformers import SentenceTransformer
-    import faiss
+    try:
+        print("🔄 Starting RAG load...")
 
-    print("Loading RAG data...")
+        from sentence_transformers import SentenceTransformer
+        import faiss
 
-    with open("data.json", "r", encoding="utf-8") as f:
-        raw_data = json.load(f)
+        with open("data.json", "r", encoding="utf-8") as f:
+            raw_data = json.load(f)
 
-    embedder = SentenceTransformer("all-MiniLM-L6-v2")
-    dim = 384
-    index = faiss.IndexFlatL2(dim)
+        print("📄 Loaded data.json items:", len(raw_data))
 
-    for item in raw_data:
-        text = item["text"]
-        chunks = [text[i:i+400] for i in range(0, len(text), 400)]
+        embedder = SentenceTransformer("all-MiniLM-L6-v2")
+        print("🧠 Model loaded")
 
-        for chunk in chunks:
-            emb = embedder.encode(chunk)
-            index.add(np.array([emb]).astype("float32"))
-            documents.append(chunk)
-            metadata.append({
-                "source": item["source"],
-                "url": item["url"],
-                "type": item["type"]
-            })
+        dim = 384
+        index = faiss.IndexFlatL2(dim)
 
-    rag_ready = True
-    print("RAG READY. Total chunks:", len(documents))
+        for item in raw_data:
+            text = item["text"]
+            chunks = [text[i:i+400] for i in range(0, len(text), 400)]
+
+            for chunk in chunks:
+                emb = embedder.encode(chunk)
+                index.add(np.array([emb]).astype("float32"))
+                documents.append(chunk)
+                metadata.append({
+                    "source": item["source"],
+                    "url": item["url"],
+                    "type": item["type"]
+                })
+
+        rag_ready = True
+        print("✅ RAG READY. Total chunks:", len(documents))
+
+    except Exception as e:
+        print("❌ RAG LOAD FAILED:", repr(e))
+
+
 
 # ---------------- STARTUP ----------------
 @app.on_event("startup")
