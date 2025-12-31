@@ -636,13 +636,13 @@ def perplexity_search(query: str):
     payload = {
         "query": query,
         "recency": 365,
-        "domains": [
-            "techcrunch.com",
-            "crunchbase.com",
-            "yourstory.com",
-            "inc42.com",
-            "economicstimes.indiatimes.com"
-        ]
+        # "domains": [
+        #     "techcrunch.com",
+        #     "crunchbase.com",
+        #     "yourstory.com",
+        #     "inc42.com",
+        #     "economicstimes.indiatimes.com"
+        # ]
     }
 
     r = requests.post(
