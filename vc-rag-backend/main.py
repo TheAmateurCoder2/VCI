@@ -705,7 +705,22 @@ Context:
 
     answer = r.json()["choices"][0]["message"]["content"]
 
+    # ---------------- SOURCE DEDUPLICATION ----------------
+    unique_sources = {}
+    for m in retrieved_meta:
+        url = m.get("url")
+        if url and url not in unique_sources:
+            unique_sources[url] = {
+                "url": url,
+                "source": m.get("source"),
+                "type": m.get("type")
+            }
+
+    sources = list(unique_sources.values())[:3]  # limit to top 3
+
     return {
         "answer": answer,
-        "sources": retrieved_meta
+        "sources": sources
     }
+
+
