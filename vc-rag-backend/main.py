@@ -660,11 +660,17 @@ Context handling rules (IMPORTANT):
 - NEVER refuse to answer due to missing or irrelevant context.
 - NEVER explain your internal reasoning, retrieval process, or limitations.
 
+Mention sources in the end in the format
+Sources:
+- Source 1 (link)
+- Source 2 (link)
+- Source 3 (link)
+...
 
 Question:
 {q.query}
 
-Context:
+Context (Consider only if relevant, else ignore):
 {context}
 """
 
