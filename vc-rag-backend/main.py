@@ -652,6 +652,15 @@ Formatting rules (STRICT):
 - Use paragraphs and line breaks for readability.
 - Highlight key facts (dates, amounts, names) in **bold**.
 
+Context handling rules (IMPORTANT):
+- First, check whether the provided context is relevant to the question.
+- If the context is partially relevant, use it where applicable and supplement missing facts with your own verified knowledge.
+- If the context is irrelevant or insufficient, IGNORE it completely and answer using your general knowledge.
+- NEVER state that the context is irrelevant, missing, or mismatched.
+- NEVER refuse to answer due to missing or irrelevant context.
+- NEVER explain your internal reasoning, retrieval process, or limitations.
+
+
 Question:
 {q.query}
 
