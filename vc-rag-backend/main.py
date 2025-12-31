@@ -570,49 +570,49 @@ class Query(BaseModel):
     query: str
 
 # ---------------- GLOBALS ----------------
-embedder = None
-index = None
-documents = []
-metadata = []
-rag_ready = False
-rag_lock = threading.Lock()
+# embedder = None
+# index = None
+# documents = []
+# metadata = []
+# rag_ready = False
+# rag_lock = threading.Lock()
 
 # ---------------- RAG LOADER (LAZY) ----------------
-def load_rag():
-    global embedder, index, documents, metadata, rag_ready
-
-    print("🔄 Starting RAG load...")
-
-    from sentence_transformers import SentenceTransformer
-    import faiss
-
-    with open("data.json", "r", encoding="utf-8") as f:
-        raw_data = json.load(f)
-
-    print("📄 Loaded data.json items:", len(raw_data))
-
-    embedder = SentenceTransformer("all-MiniLM-L6-v2")
-    print("🧠 Model loaded")
-
-    dim = 384
-    index = faiss.IndexFlatL2(dim)
-
-    for item in raw_data:
-        text = item["text"]
-        chunks = [text[i:i+400] for i in range(0, len(text), 400)]
-
-        for chunk in chunks:
-            emb = embedder.encode(chunk)
-            index.add(np.array([emb]).astype("float32"))
-            documents.append(chunk)
-            metadata.append({
-                "source": item["source"],
-                "url": item["url"],
-                "type": item["type"]
-            })
-
-    rag_ready = True
-    print("✅ RAG READY. Total chunks:", len(documents))
+# def load_rag():
+#     global embedder, index, documents, metadata, rag_ready
+#
+#     print("🔄 Starting RAG load...")
+#
+#     from sentence_transformers import SentenceTransformer
+#     import faiss
+#
+#     with open("data.json", "r", encoding="utf-8") as f:
+#         raw_data = json.load(f)
+#
+#     print("📄 Loaded data.json items:", len(raw_data))
+#
+#     embedder = SentenceTransformer("all-MiniLM-L6-v2")
+#     print("🧠 Model loaded")
+#
+#     dim = 384
+#     index = faiss.IndexFlatL2(dim)
+#
+#     for item in raw_data:
+#         text = item["text"]
+#         chunks = [text[i:i+400] for i in range(0, len(text), 400)]
+#
+#         for chunk in chunks:
+#             emb = embedder.encode(chunk)
+#             index.add(np.array([emb]).astype("float32"))
+#             documents.append(chunk)
+#             metadata.append({
+#                 "source": item["source"],
+#                 "url": item["url"],
+#                 "type": item["type"]
+#             })
+#
+#     rag_ready = True
+#     print("✅ RAG READY. Total chunks:", len(documents))
 
 
 
@@ -675,54 +675,54 @@ def load_rag():
 
 
 
-import re
-
-def extract_search_query(answer_text: str):
-    """
-    Extracts SearchQuery_23456 and returns:
-    - base_answer (without SearchQuery section)
-    - search_query (or None)
-    """
-    match = re.search(r"SearchQuery_23456:\s*(.+)", answer_text, re.DOTALL)
-
-    if not match:
-        return answer_text.strip(), None
-
-    search_query = match.group(1).strip()
-    base_answer = answer_text[:match.start()].strip()
-
-    if search_query.upper() == "NONE":
-        return base_answer, None
-
-    return base_answer, search_query
-
-
-def perplexity_search(query: str, max_results: int = 5):
-    r = requests.post(
-        "https://api.perplexity.ai/search",
-        headers={
-            "Authorization": f"Bearer {PPLX_API_KEY}",
-            "Content-Type": "application/json"
-        },
-        json={
-            "query": query,
-            "max_results": max_results
-        },
-        timeout=30
-    )
-
-    r.raise_for_status()
-    return r.json().get("results", [])
-
-
-def format_search_context(results):
-    lines = []
-    for r in results:
-        title = r.get("title", "")
-        url = r.get("url", "")
-        snippet = r.get("snippet", "")
-        lines.append(f"- {title}\n  {snippet}\n  Source: {url}")
-    return "\n\n".join(lines)
+# import re
+#
+# def extract_search_query(answer_text: str):
+#     """
+#     Extracts SearchQuery_23456 and returns:
+#     - base_answer (without SearchQuery section)
+#     - search_query (or None)
+#     """
+#     match = re.search(r"SearchQuery_23456:\s*(.+)", answer_text, re.DOTALL)
+#
+#     if not match:
+#         return answer_text.strip(), None
+#
+#     search_query = match.group(1).strip()
+#     base_answer = answer_text[:match.start()].strip()
+#
+#     if search_query.upper() == "NONE":
+#         return base_answer, None
+#
+#     return base_answer, search_query
+#
+#
+# def perplexity_search(query: str, max_results: int = 5):
+#     r = requests.post(
+#         "https://api.perplexity.ai/search",
+#         headers={
+#             "Authorization": f"Bearer {PPLX_API_KEY}",
+#             "Content-Type": "application/json"
+#         },
+#         json={
+#             "query": query,
+#             "max_results": max_results
+#         },
+#         timeout=30
+#     )
+#
+#     r.raise_for_status()
+#     return r.json().get("results", [])
+#
+#
+# def format_search_context(results):
+#     lines = []
+#     for r in results:
+#         title = r.get("title", "")
+#         url = r.get("url", "")
+#         snippet = r.get("snippet", "")
+#         lines.append(f"- {title}\n  {snippet}\n  Source: {url}")
+#     return "\n\n".join(lines)
 
 
 
