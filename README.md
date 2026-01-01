@@ -1,172 +1,145 @@
-VeriCap Intel
+# VeriCap Intel (VCI)  
+### **Verified Capital Intelligence**
 
-VeriCap Intel (VCI)
-Verified Capital Intelligence
+VeriCap Intel (VCI) is a **purpose-built AI-powered investment intelligence platform** designed to bridge the information gap between **startup founders and venture capital investors**.  
+It transforms fragmented, noisy startup data into **verified, actionable insights** using a **production-grade Retrieval-Augmented Generation (RAG) pipeline**.
 
-VeriCap Intel (VCI) is a purpose-built AI-powered investment intelligence platform designed to bridge the information gap between startup founders and venture capital investors.
-It transforms fragmented, noisy startup data into verified, actionable insights using a production-grade Retrieval-Augmented Generation (RAG) pipeline.
+Unlike general-purpose chatbots, VCI prioritizes **accuracy, provenance, relevance, and real-world decision-making**.
 
-Unlike general-purpose chatbots, VCI prioritizes accuracy, provenance, relevance, and real-world decision-making.
+---
 
-Problem Statement
+## 🧩 Problem Statement
 
-The startup ecosystem generates massive amounts of data every day—funding announcements, investor theses, news articles, PDFs, and reports.
-However:
+The startup ecosystem generates massive volumes of data every day—funding announcements, investor theses, news articles, PDFs, and unstructured reports. However:
 
-Founders spend weeks researching compatible VCs
+- Founders spend weeks manually researching compatible investors  
+- VCs struggle to filter noise and identify high-potential startups  
+- Generic AI tools often return **outdated, incomplete, or unverifiable information**  
+- Confident but incorrect answers can lead to poor investment decisions  
 
-VCs struggle to cut through noise to find high-potential startups
+**There is a clear need for a verified, domain-specific intelligence system built for investment workflows.**
 
-Existing AI tools provide generic, outdated, or unverifiable answers
+---
 
-Incorrect or hallucinated information can lead to poor decisions
+## 💡 Solution Overview
 
-VCI solves this by acting as a disciplined, domain-specific AI investment analyst.
-
-💡 Solution Overview
-
-VCI is built as a verified intelligence layer on top of startup and VC data.
+VeriCap Intel (VCI) acts as a **verified intelligence layer** on top of startup and VC data.
 
 It:
+- Retrieves only **highly relevant, ranked sources**
+- Uses **strict RAG guardrails** to minimize hallucinations
+- Integrates **real-time search** when internal data is insufficient
+- Converts insights into **direct founder–VC connections**
 
-Retrieves only relevant, ranked sources
+---
 
-Uses strict RAG guardrails to prevent hallucinations
+## ⚙️ Core Features
 
-Integrates real-time search when internal data is insufficient
+### 🔍 AI-Powered Investment Research
+- Semantic search over startup and VC data using vector embeddings  
+- Context-aware responses grounded in retrieved documents  
+- Explicit handling of missing or low-confidence data  
 
-Converts insights into direct founder–VC connections
+### 🧠 Retrieval-Augmented Generation (RAG)
+- Vector database for semantic retrieval  
+- Source-ranking heuristics to prioritize credible information  
+- Answer generation constrained strictly to retrieved evidence  
 
-⚙️ Core Features
-🔍 AI-Powered Investment Research
+### 🌐 Real-Time Search Integration
+- Dynamically fetches up-to-date information when internal data is outdated or unavailable  
+- Prevents stale or misleading responses in fast-moving startup ecosystems  
 
-Semantic search over startup and VC data using vector embeddings
+### 🤝 Founder ↔ VC Discovery & Connection
 
-Context-aware answers grounded in retrieved documents
+**Founders → VCs**
+- View investor focus areas, stages, geography, and contact details  
+- Directly connect with relevant venture capital firms  
 
-Explicit handling of missing or low-confidence data
+**VCs → Founders**
+- Discover startups aligned with their investment thesis  
+- Request pitch decks or initiate introductions  
 
-🧠 Retrieval-Augmented Generation (RAG)
+### 🛡️ Accuracy & Trust by Design
+- No blind confidence when reliable data is missing  
+- Transparent, verifiable outputs  
+- Designed for real investment decision-making—not casual conversation  
 
-Vector database for semantic retrieval
+---
 
-Source-ranking heuristics to prioritize credible information
+## 🆚 Why VeriCap Intel over General-Purpose AI
 
-Answer generation constrained to retrieved evidence only
+| Aspect | General LLMs | VeriCap Intel (VCI) |
+|------|--------------|---------------------|
+| Purpose | General conversation | Investment intelligence |
+| Data Freshness | Not guaranteed | Real-time search supported |
+| Hallucination Control | Limited | Strict RAG guardrails |
+| Source Ranking | Implicit or none | Explicit heuristics |
+| Actionability | Ends at answers | Enables direct connections |
+| Domain Optimization | No | Yes (VC & startup focused) |
 
-🌐 Real-Time Search Integration
+**VCI doesn’t try to know everything—it ensures that what it knows is correct.**
 
-Dynamically fetches up-to-date information when internal data is outdated or unavailable
+---
 
-Prevents stale or misleading responses in fast-changing ecosystems
+## 🏗️ System Architecture (High-Level)
 
-🤝 Founder ↔ VC Discovery & Connection
+1. **Data Ingestion**  
+   Startup profiles, VC data, funding information, articles, and reports  
 
-Founders → VCs
+2. **Embedding & Storage**  
+   Documents converted into vector embeddings and stored in a vector database  
 
-View investor focus areas, stages, geography, and contact details
+3. **Semantic Retrieval**  
+   Query-based retrieval of top relevant documents with ranking and filtering  
 
-Directly connect with relevant VCs
+4. **Answer Generation**  
+   LLM generates responses strictly grounded in retrieved data  
 
-VCs → Founders
+5. **Real-Time Augmentation**  
+   External search invoked when internal data is insufficient  
 
-Discover startups aligned with their investment thesis
+6. **Action Layer**  
+   Founder–VC discovery and direct connection workflows  
 
-Request pitch decks or initiate introductions
+---
 
-🛡️ Accuracy & Trust by Design
+## 🖥️ Tech Stack
 
-No blind confidence when data is missing
+- **Frontend:** React  
+- **Backend:** FastAPI  
+- **AI / NLP:** Large Language Models (API-based inference)  
+- **Search:** Vector Database + Real-Time Search API  
+- **Architecture:** Retrieval-Augmented Generation (RAG)  
+- **Deployment:** Cloud-deployable, modular design  
 
-Transparent, verifiable responses
+---
 
-Built for real investment workflows—not casual conversation
+## 🎯 Use Cases
 
-🆚 Why VCI over General-Purpose AI (e.g., ChatGPT)
-Aspect	General LLMs	VeriCap Intel (VCI)
-Purpose	General conversation	Investment intelligence
-Data Freshness	Not guaranteed	Real-time search supported
-Hallucination Control	Limited	Strict RAG guardrails
-Source Ranking	Implicit / none	Explicit heuristics
-Actionability	Ends at answers	Enables connections
-Domain Optimization	No	Yes (VC & startups)
+- Founders identifying investors aligned with their startup  
+- VCs sourcing startups matching their investment thesis  
+- Accelerators and incubators analyzing startup ecosystems  
+- Analysts validating funding and market intelligence  
 
-VCI doesn’t try to know everything—it ensures that what it knows is correct.
+---
 
-🏗️ System Architecture (High-Level)
+## 🚀 Future Enhancements
 
-Data Ingestion
+- Investor–startup compatibility scoring  
+- Advanced citation and provenance visualization  
+- Feedback-driven source ranking improvements  
+- Expanded global startup ecosystem coverage  
+- Automated deal-flow monitoring  
 
-Startup profiles, VC information, funding data, articles
+---
 
-Embedding & Storage
+## 🏁 Conclusion
 
-Documents converted to vector embeddings
+VeriCap Intel (VCI) transforms startup research from **manual guesswork** into **verified, decision-ready intelligence**.  
+It is not a chatbot—it is a **domain-specific AI investment analyst** built for trust, accuracy, and action.
 
-Stored in a vector database for semantic retrieval
+---
 
-Semantic Retrieval
-
-Query-based retrieval of top relevant documents
-
-Source filtering and ranking
-
-Answer Generation
-
-LLM generates responses strictly grounded in retrieved data
-
-Guardrails to prevent hallucinations
-
-Real-Time Augmentation
-
-External search invoked when internal data is insufficient
-
-Action Layer
-
-Founder–VC discovery and direct connection features
-
-🖥️ Tech Stack
-
-Frontend: React
-
-Backend: FastAPI
-
-AI / NLP: Large Language Models (API-based inference)
-
-Search: Vector Database + Real-Time Search API
-
-Architecture: Retrieval-Augmented Generation (RAG)
-
-Deployment: Cloud-deployable, modular design
-
-🎯 Use Cases
-
-Founders identifying VCs aligned with their startup
-
-VCs sourcing startups matching their investment thesis
-
-Accelerators and incubators performing ecosystem analysis
-
-Analysts and researchers validating funding intelligence
-
-🚀 Future Enhancements
-
-Advanced investor–startup matching scores
-
-Deeper provenance and citation visualization
-
-User feedback loops for ranking refinement
-
-Multi-region startup ecosystem coverage
-
-Automated deal-flow monitoring
-
-🏁 Conclusion
-
-VeriCap Intel (VCI) transforms startup research from manual guesswork into verified, decision-ready intelligence.
-It is not a chatbot—it is a domain-specific AI analyst built for trust, accuracy, and action.
-
-🏷️ Tagline
-
-VeriCap Intel (VCI)
-Verified Capital Intelligence
+### 🏷️ Tagline
+**VeriCap Intel (VCI)**  
+**Verified Capital Intelligence**
