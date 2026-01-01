@@ -887,42 +887,87 @@ Context (Consider only if relevant, else ignore):
         # search_results = perplexity_search(search_query)
         # search_context = format_search_context(search_results)
 
-        enrichment_prompt = f"""
-    You previously wrote the following answer:
+    #     enrichment_prompt = f"""
+    # You previously wrote the following answer:
+    #
+    # {base_answer}
+    #
+    # Below is real-time factual information retrieved from the web.
+    # Use it ONLY to enrich or add missing financial details.
+    # Do NOT contradict your original answer.
+    # Do NOT repeat unchanged information.
+    #
+    # LIVE SEARCH FACTS:
+    # {search_context}
+    # """
+    #
+    #     enrich_resp = requests.post(
+    #         PPLX_URL,
+    #         headers={
+    #             "Authorization": f"Bearer {PPLX_API_KEY}",
+    #             "Content-Type": "application/json"
+    #         },
+    #         json={
+    #             "model": "sonar-pro",
+    #             "messages": [
+    #                 {"role": "system", "content": "You are a concise venture capital research analyst."},
+    #                 {"role": "user", "content": enrichment_prompt}
+    #             ],
+    #             "temperature": 0.2,
+    #             "max_tokens": 2000
+    #         },
+    #         timeout=60
+    #     )
+    #
+    #     enrich_resp.raise_for_status()
+    #     final_answer = enrich_resp.json()["choices"][0]["message"]["content"]
+    # else:
+    #     final_answer = base_answer
 
+
+
+
+    second_prompt = f"""
+    You are a venture capital research analyst.
+
+    Below is a factual summary produced earlier, followed by verified live financial data.
+    Your task is to provide ADDITIONAL financial details that COMPLEMENT the summary.
+
+    Rules:
+    - Do NOT restate or rewrite the summary.
+    - ONLY add new financial facts (amounts, investors, rounds, dates, valuations).
+    - Be concise and factual.
+    - Use Markdown.
+    - Use bullet points where appropriate.
+
+    SUMMARY (DO NOT REPEAT):
     {base_answer}
 
-    Below is real-time factual information retrieved from the web.
-    Use it ONLY to enrich or add missing financial details.
-    Do NOT contradict your original answer.
-    Do NOT repeat unchanged information.
-
-    LIVE SEARCH FACTS:
+    LIVE FINANCIAL INFORMATION:
     {search_context}
     """
 
-        enrich_resp = requests.post(
-            PPLX_URL,
-            headers={
-                "Authorization": f"Bearer {PPLX_API_KEY}",
-                "Content-Type": "application/json"
-            },
-            json={
-                "model": "sonar-pro",
-                "messages": [
-                    {"role": "system", "content": "You are a concise venture capital research analyst."},
-                    {"role": "user", "content": enrichment_prompt}
-                ],
-                "temperature": 0.2,
-                "max_tokens": 2000
-            },
-            timeout=60
-        )
+    second_resp = requests.post(
+        PPLX_URL,
+        headers={
+            "Authorization": f"Bearer {PPLX_API_KEY}",
+            "Content-Type": "application/json"
+        },
+        json={
+            "model": "sonar-pro",
+            "messages": [
+                {"role": "system", "content": "You are a concise venture capital research analyst."},
+                {"role": "user", "content": second_prompt}
+            ],
+            "temperature": 0.2,
+            "max_tokens": 1500
+        },
+        timeout=60
+    )
 
-        enrich_resp.raise_for_status()
-        final_answer = enrich_resp.json()["choices"][0]["message"]["content"]
-    else:
-        final_answer = base_answer
+    second_resp.raise_for_status()
+    additional_answer = second_resp.json()["choices"][0]["message"]["content"]
+
 
 
 
@@ -954,11 +999,16 @@ Context (Consider only if relevant, else ignore):
                     "type": "live-search"
                 }
 
+    # return {
+    #     "answer": final_answer,
+    #     "sources": sources
+    # }
+
     return {
-        "answer": final_answer,
+        "answer": base_answer,
+        "additional_answer": additional_answer,
         "sources": sources
     }
-
 
     # return {
     #     "answer": "temp",
