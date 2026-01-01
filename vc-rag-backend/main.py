@@ -939,6 +939,13 @@ Context (Consider only if relevant, else ignore):
     - Be concise and factual.
     - Use Markdown.
     - Use bullet points where appropriate.
+    - Do NOT include citation markers like [1], [2], or [3].
+    - Add clickable URLs when appropriate to text.
+    - Use proper Markdown formatting.
+    - Convert all URLs into clickable Markdown links: [descriptive text](https://example.com)
+    - Never place raw URLs in square brackets or inline text.
+    - Use paragraphs and line breaks for readability.
+    - Highlight key facts (dates, amounts, names) in **bold**.
 
     SUMMARY (DO NOT REPEAT):
     {base_answer}
